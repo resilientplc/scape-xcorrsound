@@ -5,6 +5,7 @@
 #include <cstdio>
 #include "stdint.h"
 #include <string>
+#include <memory>
 #include "AudioStream.h"
 
 class AudioFile {
@@ -32,7 +33,7 @@ public:
     uint32_t getSampleRate();
     size_t getNumberOfSamplesPrChannel();
     void getSamplesForChannel(size_t channel, std::vector<int16_t>&);
-    AudioStream getStream(size_t channel);
+    std::auto_ptr<AudioStream> getStream(size_t channel);
 };
 
 #endif

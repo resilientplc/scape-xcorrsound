@@ -6,6 +6,11 @@
 #include <sstream>
 #include <vector>
 
+#if (defined(WIN32))
+#include <fcntl.h>
+#include <errno.h>
+#endif
+
 #include "boost/program_options.hpp"
 
 #include "AudioFile.h"
@@ -211,6 +216,33 @@ int main(int argc, char *argv[]) {
 
     init(argc, argv);
 
+    // Under Windows Visual C++ 2010 (not Cygwin) we must enable binary mode for fopen.
+    std::cout << "Starting" << std::endl;
+#if (defined(__WIN32__))
+    std::cout << "__WIN32__" << std::endl;
+#endif
+#if (defined(__WIN32))
+    std::cout << "__WIN32" << std::endl;
+#endif
+#if (defined(WIN32))
+    std::cout << "WIN32" << std::endl;
+#endif
+#if (defined(__CYGWIN__))
+    std::cout << "__CYGWIN__" << std::endl;
+#endif
+#if (defined(__CYGWIN))
+    std::cout << "__CYGWIN" << std::endl;
+#endif
+
+#if (defined(WIN32) && !(defined(__CYGWIN__)))
+    std::cout << "Setting binary mode for windows" << std::endl;
+    errno_t fmode_err = _set_fmode(_O_BINARY);
+    if (fmode_err == EINVAL) {
+        std::cerr << "Cannot set O_BINARY mode" << std::endl;
+        return 1;
+    }
+#endif
+
     AudioFile a(input1.c_str());
     AudioFile b(input2.c_str());
 
@@ -224,8 +256,9 @@ int main(int argc, char *argv[]) {
     uint32_t samplesPrBlock = a.getSampleRate() * secondsPrBlock;
     ls << log_debug() << "samples a: " << samplesPrBlock << endl;
     ls << log_debug() << "samples b: " << b.getSampleRate() * secondsPrBlock << endl;
-    AudioStream aStream = a.getStream(channel);
-    AudioStream bStream = b.getStream(channel);
+    std::auto_ptr<AudioStream> aStream = a.getStream(channel);
+    std::auto_ptr<AudioStream> bStream = b.getStream(channel);
+
 
     bool done = false;
     bool first = true;
@@ -245,8 +278,8 @@ int main(int argc, char *argv[]) {
         vector<uint64_t> aSquarePrefixSum, bSquarePrefixSum;
         vector<complex<double> > result;
 
-        aStream.read(samplesPrBlock, aSamples);
-        bStream.read(samplesPrBlock, bSamples);
+        aStream->read(samplesPrBlock, aSamples);
+        bStream->read(samplesPrBlock, bSamples);
 
         if (aSamples.size() == 0 && bSamples.size() == 0) {
             // reached the end of both of the samples

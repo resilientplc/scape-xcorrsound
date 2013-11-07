@@ -6,7 +6,6 @@
 #include <cmath>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "stdint.h"
@@ -70,7 +69,7 @@ void printchar(char n) {
 	    printf("%d",0);
 	}
     }
-    printf("\n");    
+    printf("\n");
 }
 
 uint32_t convertFourBytesToInt(unsigned char a, unsigned char b, unsigned char c, unsigned char d) {
@@ -87,7 +86,7 @@ uint32_t convertFourBytesToInt(unsigned char a, unsigned char b, unsigned char c
     res = res | bi;
     res = res << 8;
     res = res | ai;
-    
+
     return res;
 }
 

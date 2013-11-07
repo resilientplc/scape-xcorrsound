@@ -5,7 +5,11 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#if (defined(WIN32))
+#include <winsock2.h>
+#else
 #include <sys/time.h>
+#endif
 #include "stdlib.h"
 
 int getFilesize(std::string filename);
@@ -18,7 +22,7 @@ size_t timeDiff(timeval &tvStart, timeval &tvEnd);
 
 std::string getTimestampFromSeconds(size_t seconds);
 
-template<typename T1, typename T2> 
+template<typename T1, typename T2>
 inline
 void prefixSquareSum(std::vector<T1> &a, std::vector<T2> &res) {
     res.resize(a.size());
@@ -30,7 +34,7 @@ void prefixSquareSum(std::vector<T1> &a, std::vector<T2> &res) {
 
 template<typename T1, typename T2>
 inline
-void prefixSquareSum(typename std::vector<T1>::iterator &begin, 
+void prefixSquareSum(typename std::vector<T1>::iterator &begin,
 		     typename std::vector<T1>::iterator &end,
 		     std::vector<T2> &res) {
 
@@ -51,10 +55,10 @@ void prefixSquareSum(typename std::vector<T1>::iterator &begin,
 }
 
 template<typename T1> inline
-double computeNormFactor(std::vector<T1> &prefixSquareSmall, std::vector<T1> &prefixSquareLarge, 
+double computeNormFactor(std::vector<T1> &prefixSquareSmall, std::vector<T1> &prefixSquareLarge,
 		     typename std::vector<T1>::iterator smallBegin, typename std::vector<T1>::iterator smallEnd,
 		     typename std::vector<T1>::iterator largeBegin, typename std::vector<T1>::iterator largeEnd) {
-    
+
     if (smallEnd != prefixSquareSmall.begin()) --smallEnd;
 
     T1 smallVal = *smallEnd;
@@ -66,7 +70,7 @@ double computeNormFactor(std::vector<T1> &prefixSquareSmall, std::vector<T1> &pr
 
     if (largeEnd != prefixSquareLarge.begin()) --largeEnd;
 
-    T1 largeVal = *largeEnd;    
+    T1 largeVal = *largeEnd;
 
     if (largeBegin != prefixSquareLarge.begin()) {
 	--largeBegin;

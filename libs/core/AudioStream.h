@@ -25,7 +25,7 @@ private:
         _end = fread(_buf, 1, _bufferSize, _file);
         _pos = 0;
     }
-    
+
     inline uint8_t readNext() {
         if (_pos == _end) {
             fillBuffer();
@@ -42,21 +42,22 @@ private:
     }
 
 public:
-    
-    AudioStream(size_t channel, size_t channels, std::string filename, size_t startOfData) 
+
+    AudioStream(size_t channel, size_t channels, std::string filename, size_t startOfData)
         : _file(fopen(filename.c_str(), "r")),
 	  _channel(channel),
 	  _channels(channels),
         _pos(0),
-        _end(0) {	
+        _end(0) {
 
         fseek(_file, startOfData, SEEK_SET);
     }
 
     ~AudioStream() {
         fclose(_file);
+        _file = 0;
     }
-    
+
     /**
      * invariant: after each read we are at the next sample
      */
@@ -69,7 +70,7 @@ public:
                 readNext();
                 readNext();
             }
-            
+
             char first = readNext();
             char second = readNext();
             for (size_t j = _channel+1; j < _channels; ++j) {

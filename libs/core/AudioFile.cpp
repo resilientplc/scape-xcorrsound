@@ -4,14 +4,13 @@
 #include <cstring>
 #include <vector>
 #include <stdint.h>
-#include <iostream>
 #include <memory>
 
 #include "my_utils.h"
 
 using namespace std;
 
-AudioFile::AudioFile(const char *path) : fd(fopen(path,"r")), _channels(0), _sampleRate(0),
+AudioFile::AudioFile(const char *path) : fd(fopen(path, "r")), _channels(0), _sampleRate(0),
 					 _samplesPrChannel(0), _fileSize(0), _audioFormat(0),
 					 _byteRate(0), _blockAlign(0), _bitsPrSample(0), _filename(path) {
     populateFieldVariables();
@@ -20,7 +19,7 @@ AudioFile::AudioFile(const char *path) : fd(fopen(path,"r")), _channels(0), _sam
 
 AudioFile::~AudioFile() {
     if (fd)
-	fclose(fd);
+        fclose(fd);
     fd = NULL;
 }
 
@@ -57,7 +56,7 @@ void AudioFile::getSamplesForChannelInRange(size_t begin, size_t end, vector<int
     for (size_t i = 0; i < toRead; i+=4) {
 	samples[i/4] = getIntFromChars(buf[i], buf[i+1]);
     }
-    
+
     delete[] buf;
 }
 
@@ -73,7 +72,7 @@ void AudioFile::getSamplesForChannel(size_t channel, std::vector<int16_t> &out) 
     size_t read = 0;
     while (!feof(fd)) {
         fseek(fd, read, SEEK_CUR);
-        size_t read = fread(buf, 1, sizeof(buf), fd);	
+        size_t read = fread(buf, 1, sizeof(buf), fd);
         for (size_t i = 0; i < read; i+=4) {
             out.push_back(getIntFromChars(buf[i], buf[i+1]));
         }
@@ -93,11 +92,11 @@ void AudioFile::populateFieldVariables() {
 
     uint8_t buf[1024];
     fseek(fd, 0, SEEK_SET);
-    size_t read = fread(buf, 1, 12, fd);    
+    size_t read = fread(buf, 1, 12, fd);
     if (read < 12) return; // error.. should probably throw exception.
     size_t chunkSize = getIntFromChars(buf[4], buf[5], buf[6], buf[7]);
     if (chunkSize != _fileSize - 8) return; // error.. chunkSize is the byte size minus 8 of the file.
-    
+
     // read start of next chunk to get size.
     read = fread(buf, 1, 8, fd);
     if (read < 8) return; // error..
@@ -115,7 +114,7 @@ void AudioFile::populateFieldVariables() {
     this->_bitsPrSample = getIntFromChars(buf[14], buf[15]);
 
     read = fread(buf, 1, 1024, fd);
-    
+
     // hopefully the following always works.. but it definitely might not.
     size_t startInBuf = 0;
     for (size_t i = 0; i < read-8; ++i) {
@@ -127,8 +126,8 @@ void AudioFile::populateFieldVariables() {
     }
 
     size_t subChunk2Size = getIntFromChars(buf[startInBuf],
-                                           buf[startInBuf+1], 
-                                           buf[startInBuf+2], 
+                                           buf[startInBuf+1],
+                                           buf[startInBuf+2],
                                            buf[startInBuf+3]);
 
     this->_samplesPrChannel = subChunk2Size * 8;
@@ -139,8 +138,8 @@ void AudioFile::populateFieldVariables() {
 
 }
 
-AudioStream AudioFile::getStream(size_t channel) {
-    if (!(this->_startOfData))        
+std::auto_ptr<AudioStream> AudioFile::getStream(size_t channel) {
+    if (!(this->_startOfData))
         populateFieldVariables();
-    return AudioStream(channel, this->_channels, this->_filename, this->_startOfData);
+    return std::auto_ptr<AudioStream>(new AudioStream(channel, this->_channels, this->_filename, this->_startOfData));
 }
