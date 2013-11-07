@@ -5,6 +5,14 @@
 
 using namespace std;
 
+namespace level {
+    const int32_t FATAL = 1;
+    const int32_t ERROR = 2;
+    const int32_t INFORMATION = 3;
+    const int32_t WARNING = 4;
+    const int32_t DEBUG = 5;
+}
+
 /**
  * logstream buffer start
  */
@@ -62,41 +70,41 @@ void logstream::set_print_level(int32_t n) {
  */
 
 log_level log_debug() {
-    return log_level(logstream::DEBUG);
+    return log_level(level::DEBUG);
 }
 
 log_level log_information() {
-    return log_level(logstream::INFORMATION);
+    return log_level(level::INFORMATION);
 }
 
 log_level log_fatal() {
-    return log_level(logstream::FATAL);
+    return log_level(level::FATAL);
 }
 
 log_level log_error() {
-    return log_level(logstream::ERROR);
+    return log_level(level::ERROR);
 }
 
 log_level log_warning() {
-    return log_level(logstream::WARNING);
+    return log_level(level::WARNING);
 }
 
 logstream& operator<<(logstream &ls, log_level ll) {
     ls.set_level(ll.n);
     switch (ll.n) {
-    case logstream::DEBUG:
+    case level::DEBUG:
 	ls << std::endl << " --- DEBUG --- " << std::endl;
 	break;
-    case logstream::INFORMATION:
+    case level::INFORMATION:
 	ls << std::endl << " --- INFORMATIONAL ---" << std::endl;
 	break;
-    case logstream::FATAL:
+    case level::FATAL:
 	ls << std::endl << " --- FATAL ---" << std::endl;
 	break;
-    case logstream::ERROR:
+    case level::ERROR:
 	ls << std::endl << " --- ERROR ---" << std::endl;
 	break;
-    case logstream::WARNING:
+    case level::WARNING:
 	ls << std::endl << " --- WARNING ---" << std::endl;
 	break;
     }

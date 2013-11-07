@@ -16,7 +16,7 @@ private:
 public:
     logstreambuffer(int32_t level, const char *filename);
     ~logstreambuffer();
-    
+
     void flush();
     int overflow(int c = std::char_traits<char>::eof());
     int sync();
@@ -32,12 +32,6 @@ public:
     logstream(int32_t level, const char *filename) : std::ostream(&buffer), buffer(level, filename) {};
     void set_level(int32_t _level);
     void set_print_level(int32_t level);
-    static const int32_t FATAL = 1;
-    static const int32_t ERROR = 2;
-    static const int32_t INFORMATION = 3;
-    static const int32_t WARNING = 4;
-    static const int32_t DEBUG = 5;    
-
 };
 
 /**
