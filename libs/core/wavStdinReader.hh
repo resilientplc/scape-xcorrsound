@@ -4,7 +4,6 @@
 #include <cstring>
 #include <iostream>
 #include <stdint.h>
-#include <unistd.h>
 #include <vector>
 
 class wavStdinReader {
@@ -15,7 +14,7 @@ private:
 
     size_t startOfData;
     size_t sizeOfData;
-    
+
     uint32_t sizeOfInput;
 public:
     wavStdinReader();

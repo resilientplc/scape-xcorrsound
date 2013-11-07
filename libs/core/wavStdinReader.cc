@@ -2,27 +2,27 @@
 #include <iostream>
 #include <my_utils.h>
 #include <stdint.h>
-#include <unistd.h>
+#include <cstdio>
 #include <vector>
 #include <wavStdinReader.hh>
 
 wavStdinReader::wavStdinReader() {
     char riff[4];
-    
-    size_t bytesRead = read(0, &riff[0], 4);
+
+    size_t bytesRead = fread(&riff[0], 1, 4, stdin);
     if (bytesRead != 4 || strncmp(riff, "riff", 4) != 0) {
         // error: wrong format.
     }
 
-    bytesRead = read(0, &sizeOfInput, 4);
+    bytesRead = fread(&sizeOfInput, 1, 4, stdin);
     if (bytesRead != 4) {
         // error: not enough input.
     }
 
     buf = new char[sizeOfInput];
-    bytesRead = read(0, buf, sizeOfInput);
+    bytesRead = fread(buf, 1, sizeOfInput, stdin);
     while (bytesRead != sizeOfInput) {
-        bytesRead += read(0, &buf[bytesRead], sizeOfInput-bytesRead);
+        bytesRead += fread(&buf[bytesRead], 1, sizeOfInput-bytesRead, stdin);
     }
     // if (bytesRead != sizeOfData) {
     //     // error: header and filesize do not correspond.
@@ -38,7 +38,7 @@ wavStdinReader::wavStdinReader() {
     }
     sizeOfData = buf[startOfData-4] + (((int)buf[startOfData-3])<<8) +
         (((int)buf[startOfData-2]) << 16) + (((int)buf[startOfData-1]) << 24);
-    
+
     sizeOfData = sizeOfInput-startOfData;
 
     if (strncmp(&buf[0], "fmt ", 2) != 0) {
@@ -58,7 +58,7 @@ wavStdinReader::wavStdinReader() {
     if (!(buf[26] == 16 && buf[27] == 0)) {
         // error: we only support 16 bits/sample
     }
-    
+
 }
 
 wavStdinReader::~wavStdinReader() {
