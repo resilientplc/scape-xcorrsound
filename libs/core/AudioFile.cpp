@@ -138,8 +138,8 @@ void AudioFile::populateFieldVariables() {
 
 }
 
-std::auto_ptr<AudioStream> AudioFile::getStream(size_t channel) {
+std::unique_ptr<AudioStream> AudioFile::getStream(size_t channel) {
     if (!(this->_startOfData))
         populateFieldVariables();
-    return std::auto_ptr<AudioStream>(new AudioStream(channel, this->_channels, this->_filename, this->_startOfData));
+    return std::unique_ptr<AudioStream>(new AudioStream(channel, this->_channels, this->_filename, this->_startOfData));
 }

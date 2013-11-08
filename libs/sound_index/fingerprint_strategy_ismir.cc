@@ -224,9 +224,9 @@ namespace sound_index {
             std::stringstream tmpss;
 
             AudioFile a(tmpss.str().c_str());
-            AudioStream as(a.getStream(0));
+            std::unique_ptr<AudioStream> as(a.getStream(0));
 
-            as.read(a.getNumberOfSamplesPrChannel(), samples);
+            as->read(a.getNumberOfSamplesPrChannel(), samples);
 
             size_t idx = 0;
             for (size_t i = filename.size(); i > 0; --i) {
@@ -256,8 +256,8 @@ namespace sound_index {
             int resCmd = pclose(cmd);            
         } else {
             AudioFile a(filename.c_str());
-            AudioStream as(a.getStream(0));
-            as.read(a.getNumberOfSamplesPrChannel(), samples);
+            std::unique_ptr<AudioStream> as(a.getStream(0));
+            as->read(a.getNumberOfSamplesPrChannel(), samples);
 
         }
         // implement ismir.

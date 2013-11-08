@@ -4,6 +4,16 @@ project (scape-xcorrsound)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules/")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_CXX_FLAGS "-std=c++0x")
+endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+
+if (WIN32)
+  set(Boost_NO_BOOST_CMAKE ON)
+  set(Boost_USE_STATIC_LIBS ON)
+  set(Boost_USE_STATIC_RUNTIME OFF)
+endif (WIN32)
+
 find_package(Boost
   COMPONENTS program_options)
 

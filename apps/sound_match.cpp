@@ -83,10 +83,10 @@ void match(AudioFile &needle, AudioFile &haystack, std::vector<pair<size_t, doub
 
     size_t stillToRead = largeTotalSize;
 
-    AudioStream hayStream = haystack.getStream(0);
+    std::unique_ptr<AudioStream> hayStream = haystack.getStream(0);
     size_t pieces = 13;
     for (int j = 0; ; ++j) {
-        hayStream.read(pieces*small.size(), large);
+        hayStream->read(pieces*small.size(), large);
         prefixSquareSum(large, largePrefixSum);
         size_t numberOfParts = large.size()/small.size();
         size_t idxAdd = j*pieces;
