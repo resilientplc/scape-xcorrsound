@@ -45,7 +45,7 @@ namespace {
 
 	    return *this;
 	}
-    
+
     };
 
 }
@@ -74,7 +74,7 @@ void match(AudioFile &needle, AudioFile &haystack, std::vector<pair<size_t, doub
 
     proxyFFT<short, double> smallFFT(small);
     smallFFT.transform();
-    
+
     size_t largeTotalSize = haystack.getNumberOfSamplesPrChannel();
     // vector<int64_t> maxSamplesBegin(largeTotalSize/small.size());
     // vector<int64_t> maxSamplesEnd(largeTotalSize/small.size());
@@ -83,10 +83,10 @@ void match(AudioFile &needle, AudioFile &haystack, std::vector<pair<size_t, doub
 
     size_t stillToRead = largeTotalSize;
 
-    std::unique_ptr<AudioStream> hayStream = haystack.getStream(0);
+    AudioStream hayStream = haystack.getStream(0);
     size_t pieces = 13;
     for (int j = 0; ; ++j) {
-        hayStream->read(pieces*small.size(), large);
+        hayStream.read(pieces*small.size(), large);
         prefixSquareSum(large, largePrefixSum);
         size_t numberOfParts = large.size()/small.size();
         size_t idxAdd = j*pieces;
@@ -100,7 +100,7 @@ void match(AudioFile &needle, AudioFile &haystack, std::vector<pair<size_t, doub
         for (size_t ii = 0; ii < numberOfParts*small.size(); ii += small.size()) {
             //do stuff..
             proxyFFT<short, double> largeFFT(large.begin()+ii, large.begin()+ii+small.size());
-	    
+
             vector<complex<double> > outBegin;
             vector<complex<double> > outEnd;
             //std::cout << "TEST1" << std::endl;
@@ -116,7 +116,7 @@ void match(AudioFile &needle, AudioFile &haystack, std::vector<pair<size_t, doub
                 double normFactor = computeNormFactor(smallPrefixSum, largePrefixSum,
                                                       smallPrefixSum.begin(), smallPrefixSum.end()-i,
                                                       largePrefixSum.begin()+i+ii, largePrefixSum.begin()+ii+small.size());
-	
+
                 if (outBegin[maxSampleBegin].real()/maxNormFactorBegin < outBegin[i].real()/normFactor) {
                     maxSampleBegin = i;
                     maxNormFactorBegin = normFactor;
@@ -183,9 +183,9 @@ inline void read(vector<int16_t> &res, size_t channel, FILE *fp, size_t sz) {
 int main(int argc, char **argv) {
 
     std::vector<pair<size_t, double> > res;
-    
+
     if (argc != 3) {printUsage(); return 1;}
- 
+
     AudioFile needle(argv[1]);
     AudioFile haystack(argv[2]);
 

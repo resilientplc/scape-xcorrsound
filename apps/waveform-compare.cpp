@@ -237,8 +237,8 @@ int main(int argc, char *argv[]) {
     uint32_t samplesPrBlock = a.getSampleRate() * secondsPrBlock;
     ls << log_debug() << "samples a: " << samplesPrBlock << endl;
     ls << log_debug() << "samples b: " << b.getSampleRate() * secondsPrBlock << endl;
-    std::unique_ptr<AudioStream> aStream = a.getStream(channel);
-    std::unique_ptr<AudioStream> bStream = b.getStream(channel);
+    std::unique_ptr<AudioStream> aStream = a.getSharedStream(channel);
+    std::unique_ptr<AudioStream> bStream = b.getSharedStream(channel);
 
     bool done = false;
     bool first = true;

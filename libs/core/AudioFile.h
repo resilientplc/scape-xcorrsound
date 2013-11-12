@@ -33,7 +33,8 @@ public:
     uint32_t getSampleRate();
     size_t getNumberOfSamplesPrChannel();
     void getSamplesForChannel(size_t channel, std::vector<int16_t>&);
-    std::unique_ptr<AudioStream> getStream(size_t channel);
+    AudioStream getStream(size_t channel);
+    std::unique_ptr<AudioStream> getSharedStream(size_t channel);
 };
 
 #endif

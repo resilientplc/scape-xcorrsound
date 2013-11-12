@@ -54,7 +54,7 @@ namespace {
         const double PI = 3.14159265359;
 
         window.resize(windowLength);
-    
+
         for (size_t i = 0; i < windowLength; ++i) {
             window[i] = (25.0/46.0) - (21.0/46.0) * cos((2*PI*i)/(windowLength-1));
         }
@@ -99,7 +99,7 @@ namespace {
 
     inline
     static void getBarkScale(double maxFrequency, std::vector<size_t> &indices) {
-    
+
         size_t bands = 33;
         indices.resize(bands);
 
@@ -107,17 +107,17 @@ namespace {
         double logMax = log(maxFrequency) / log(2);
 
         double delta = (logMax - logMin) / bands;
-    
+
         double sum = 0.0;
         for (size_t i = 0; i < bands; ++i) {
-        
+
             double hz = pow(2, logMin + sum);
-        
+
             indices[i] = getIndexFromHz(hz);
 
             sum += delta;
         }
-    
+
     }
 
     inline
@@ -129,12 +129,12 @@ namespace {
         double logMax = log(maxFrequency) / log(2);
 
         double delta = (logMax - logMin) / bands; //linear increase on log scale
-    
+
         double sum = 0.0;
         for (size_t i = 0; i < bands; ++i) {
-        
+
             double hz = pow(2, logMin + sum);
-        
+
             indices[i] = getIndexFromHz(hz);
 
             sum += delta;
@@ -143,12 +143,12 @@ namespace {
 
     inline
     static uint32_t getFingerprint(std::vector<double> &prevEnergy, std::vector<double> &energy) {
-    
+
         uint32_t fingerprint = 0;
 
         for (size_t bitPos = 0; bitPos < 32; ++bitPos) {
             double val = energy[bitPos] - energy[bitPos+1] - (prevEnergy[bitPos] - prevEnergy[bitPos+1]);
-        
+
             uint32_t bit = (val > 0)?1:0;
 
             fingerprint = fingerprint + (bit << bitPos);
@@ -159,9 +159,9 @@ namespace {
     }
 
     void generateFingerprintStream(std::vector<int16_t> &input, std::vector<uint32_t> &output) {
-        std::vector<double> hanningWindow; 
+        std::vector<double> hanningWindow;
         std::vector<size_t> logScale;
-    
+
         getHanningWindow(frameLength, hanningWindow);
 
         getLogScale(2000, logScale);
@@ -172,7 +172,7 @@ namespace {
         frameStart = 0; frameEnd = frameStart + frameLength;
         for (size_t frameStart = 0; frameEnd < input.size(); frameStart += advance, frameEnd += advance) {
             std::vector<std::complex<double> > transform(frameLength);
-        
+
             std::vector<double> tmp(frameLength);
             for (size_t i = 0; i < frameLength; ++i) {
                 tmp[i] = input[frameStart+i];
@@ -183,9 +183,9 @@ namespace {
             }
 
             computeFFT(tmp, transform);
-        
+
             std::vector<double> energy(33, 0.0);
-        
+
             for (size_t i = 0; i < logScale.size()-1; ++i) {
 
                 double absVal = 0.0;
@@ -195,11 +195,11 @@ namespace {
 
                 energy[i] = absVal/(logScale[i+1]-logScale[i]);
             }
-   
+
             uint32_t fingerprint = getFingerprint(prevEnergy, energy);
 
             std::swap(prevEnergy, energy);
-        
+
             output.push_back(fingerprint);
         }
     }
@@ -207,7 +207,7 @@ namespace {
 
 namespace sound_index {
 
-    void 
+    void
     fingerprint_strategy_ismir::getFingerprintsForFile(std::string filename, std::vector<uint32_t> &res) {
         std::vector<int16_t> samples;
 
@@ -216,7 +216,7 @@ namespace sound_index {
         // otherwise assume the file is 5512hz wav file.
         if (filename == "-") {
             // use stdin wav file reader.
-            
+
             wavStdinReader wsr;
             wsr.getSamplesForChannel(0, samples);
 
@@ -224,9 +224,9 @@ namespace sound_index {
             std::stringstream tmpss;
 
             AudioFile a(tmpss.str().c_str());
-            std::unique_ptr<AudioStream> as(a.getStream(0));
+            AudioStream as(a.getStream(0));
 
-            as->read(a.getNumberOfSamplesPrChannel(), samples);
+            as.read(a.getNumberOfSamplesPrChannel(), samples);
 
             size_t idx = 0;
             for (size_t i = filename.size(); i > 0; --i) {
@@ -253,18 +253,18 @@ namespace sound_index {
             std::stringstream rmss;
             rmss << "rm -rf " << tmpss.str();
             cmd = popen(rmss.str().c_str(), "r");
-            int resCmd = pclose(cmd);            
+            int resCmd = pclose(cmd);
         } else {
             AudioFile a(filename.c_str());
-            std::unique_ptr<AudioStream> as(a.getStream(0));
-            as->read(a.getNumberOfSamplesPrChannel(), samples);
+            AudioStream as(a.getStream(0));
+            as.read(a.getNumberOfSamplesPrChannel(), samples);
 
         }
         // implement ismir.
         ::generateFingerprintStream(samples, res);
     }
-    
-    size_t 
+
+    size_t
     fingerprint_strategy_ismir::getFrameLength() { return ::frameLength; }
 
     size_t

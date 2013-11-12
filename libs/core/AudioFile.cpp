@@ -138,7 +138,13 @@ void AudioFile::populateFieldVariables() {
 
 }
 
-std::unique_ptr<AudioStream> AudioFile::getStream(size_t channel) {
+AudioStream AudioFile::getStream(size_t channel) {
+    if (!(this->_startOfData))
+        populateFieldVariables();
+    return AudioStream(channel, this->_channels, this->_filename, this->_startOfData);
+}
+
+std::unique_ptr<AudioStream> AudioFile::getSharedStream(size_t channel) {
     if (!(this->_startOfData))
         populateFieldVariables();
     return std::unique_ptr<AudioStream>(new AudioStream(channel, this->_channels, this->_filename, this->_startOfData));
